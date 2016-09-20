@@ -54,10 +54,6 @@ class PostController extends BaseController
 				return back()->withErrors(array('link' => 'Ссыль некорректна'))->withInput();
 			}
 			
-			//if(!File::exists()){
-				//return back()->withErrors(array('link' => 'Ссыль некорректна'))->withInput();
-			//}
-			
 			$img = Image::make(Request::input('link'));
 			
 		}else{
@@ -81,116 +77,9 @@ class PostController extends BaseController
 			});
 		}
 
-		$width = $img->width();
-		$height = $img->height();
+		$post = Post::create();		
+		$post->reImg($img, $text);
 		
-		$post = Post::create();
-		
-		$post->adress = 'dem/'.date('Y').'/'.date('m');
-		File::makeDirectory($post->adress, 0755, true, true);
-		$post->adress = $post->adress.'/'.$post->id.'_'.str_random(20).'.jpg';
-		$img->save($post->adress);
-		
-		$img->resizeCanvas($width+12, $height+12, 'center', false, '000000');
-		$img->resizeCanvas($width+15, $height+15, 'center', false, 'ffffff');
-		$img->resizeCanvas($width+70, $height+70, 'center', false, '000000');
-		$img->resizeCanvas($width+70, $height+135, 'top', false, '000000');
-		
-		$chs = floor($width/22);
-		
-		mb_internal_encoding("UTF-8");
-		if(mb_strlen($text)<$chs+1){
-			$img->text($text,($width+70)/2,$height+90,function($font) {
-				$font->color(array(255, 255, 255, 1));
-				$font->file('AdonisC_Bold_Italic.otf');
-				$font->size(40);
-				$font->align('center');
-				$font->valign('bottom');
-			});
-		}else{
-			mb_internal_encoding("UTF-8");
-			$tempe = mb_substr($text,0,$chs);
-			
-			$pos = mb_strripos($tempe, " ", 0, "UTF-8");
-			
-			if($pos === false){
-				mb_internal_encoding("UTF-8");
-				$text = mb_substr($text,$chs,strlen($text) - $chs);
-			} else {
-				mb_internal_encoding("UTF-8");
-				$tempe = mb_substr($text,0,$pos);
-				mb_internal_encoding("UTF-8");
-				$text = mb_substr($text,$pos+1,strlen($text) - $pos - 1);
-			}
-			
-			$img->text($tempe,($width+70)/2,$height+90,function($font) {
-				$font->color(array(255, 255, 255, 1));
-				$font->file('AdonisC_Bold_Italic.otf');
-				$font->size(40);
-				$font->align('center');
-				$font->valign('bottom');
-			});
-			
-			mb_internal_encoding("UTF-8");
-			if(mb_strlen($text)<$chs+1){
-				$img->resizeCanvas($width+70, $height+200, 'top', false, '000000');
-				$img->text($text,($width+70)/2,$height+150,function($font) {
-					$font->color(array(255, 255, 255, 1));
-					$font->file('AdonisC_Bold_Italic.otf');
-					$font->size(40);
-					$font->align('center');
-					$font->valign('bottom');
-				});
-			}else{
-				mb_internal_encoding("UTF-8");
-				$tempe = mb_substr($text,0,$chs);
-					
-				$pos = mb_strripos($tempe, " ", 0, "UTF-8");
-
-				if($pos === false){
-					mb_internal_encoding("UTF-8");
-					$text = mb_substr($text,$chs,strlen($text) - $chs);
-				} else {
-					mb_internal_encoding("UTF-8");
-					$tempe = mb_substr($text,0,$pos);
-					mb_internal_encoding("UTF-8");
-					$text = mb_substr($text,$pos+1,strlen($text) - $pos - 1);
-				}
-				
-				$img->resizeCanvas($width+70, $height+200, 'top', false, '000000');
-				$img->text($tempe,($width+70)/2,$height+150,function($font) {
-					$font->color(array(255, 255, 255, 1));
-					$font->file('AdonisC_Bold_Italic.otf');
-					$font->size(40);
-					$font->align('center');
-					$font->valign('bottom');
-				});
-			
-				if(strlen($text)>0){
-					mb_internal_encoding("UTF-8");
-					$text = mb_substr($text,0,$chs);
-				
-					$img->resizeCanvas($width+70, $height+265, 'top', false, '000000');
-					$img->text($text,($width+70)/2,$height+210,function($font) {
-						$font->color(array(255, 255, 255, 1));
-						$font->file('AdonisC_Bold_Italic.otf');
-						$font->size(40);
-						$font->align('center');
-						$font->valign('bottom');
-					});
-				}
-			}
-		}
-		$img->resizeCanvas($width+70, $img->height()+20, 'top', false, '000000');
-		
-		$post->save();
-		$img->save($post->adress);
-		
-		$img->resize(300, null, function ($constraint) {
-			$constraint->aspectRatio();
-		});
-		$img->save(substr($post->adress,0,-4).'s.jpg');
-		//return strlen($tempe);
 		return Redirect::to('/num/'.$post->id);
 	}
 	
