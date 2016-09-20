@@ -19,8 +19,8 @@ class Post extends Model{
 		$img->resizeCanvas($width+70, $height+70, 'center', false, '000000');
 		$img->resizeCanvas($width+70, $height+135, 'top', false, '000000');
 		
-		$chs = floor($width/23);
-		//$chs = 5;
+		$chs = floor($width/22);
+		
 		mb_internal_encoding("UTF-8");
 		if(mb_strlen($text)<$chs+1){
 			$this->putText($img, $width, $height+90, $text);
